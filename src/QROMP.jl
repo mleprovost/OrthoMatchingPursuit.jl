@@ -1,5 +1,7 @@
 module QROMP
 
-greet() = print("Hello World!")
+using LinearAlgebra
+
+include("qr.jl")
 
 end # module
