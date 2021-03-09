@@ -8,13 +8,12 @@ export qromp
 
 function qromp(ψ::AbstractMatrix{T}, c::AbstractVector{T}, u::AbstractVector{T}; backsolve::Bool = true, ϵrel::Float64 = 1e-1) where {T}
     m, n = size(ψ)
-    @show m, n
+
     residue = copy(u)
     idxset = Int64[]
     dict = collect(1:n)
     ϵrel *= norm(u)
     ϕ = zeros(n)
-    F = qrfactUnblocked(zeros(0,0))
 
     for j=1:n
         for i=1:m
@@ -22,13 +21,12 @@ function qromp(ψ::AbstractMatrix{T}, c::AbstractVector{T}, u::AbstractVector{T}
         end
     end
 
+    F = qrfactUnblocked(zeros(0,0))
     ek = zeros(n)
     q = zeros(m)
     new_idx = 1
 
     @inbounds for k=1:n
-        # Step 5
-
         # Step 6 & 7 update denominators and choose best candidate
 
         entry = 0.0
@@ -47,6 +45,7 @@ function qromp(ψ::AbstractMatrix{T}, c::AbstractVector{T}, u::AbstractVector{T}
                 new_idx = idx
             end
         end
+        @show entry, new_idx
 
         # Step 8 Update set of selected basis
         push!(idxset, new_idx)
@@ -70,6 +69,7 @@ function qromp(ψ::AbstractMatrix{T}, c::AbstractVector{T}, u::AbstractVector{T}
         residue -= q
         # Step 12 Calculate stopping critera
         ϵ = norm(residue)
+        @show ϵ/norm(u)
         if ϵ < ϵrel
             break
         end
