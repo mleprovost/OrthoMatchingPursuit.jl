@@ -53,7 +53,8 @@ function qromp(ψ::AbstractMatrix{T}, u::AbstractVector{T}; invert::Bool=true, v
         push!(idxset, new_idx)
 
         # Step 9 Update candidate dictionary
-        filter!(x-> x != new_idx, dict)
+        # filter!(x-> x != new_idx, dict)
+        setdiff!(dict, new_idx)
 
         # Step 10 Update Q(k-1) and R(k-1) with ψi(k)
         if k>1

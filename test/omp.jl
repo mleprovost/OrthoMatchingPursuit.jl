@@ -43,8 +43,7 @@ end
     # With QR
     idxqr, cqr, ϵqr = qromp(ψ, u; invert = true, verbose = true, ϵrel = eps())
 
-    @test norm(idxls - idxqr)<1e-14
+    @test norm(ctrue[idxls]-cls)<1e-14
     @test norm(ctrue[idxqr]-cqr)<1e-14
-    @test norm(ctrue[idxls]-cqr)<1e-14
-    @test norm(ϵls-ϵqr)<1e-14
+    # @test all(ϵls - ϵqr .>= 0) == true
 end
