@@ -8,6 +8,7 @@
 *.aux
 *.svg
 .ipynb_checkpoints
+papers/
 
 # temporary matlab files
 *.m~
