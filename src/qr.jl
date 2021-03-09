@@ -41,7 +41,7 @@ function updateqrfactUnblocked!(S::QR{T,Array{T,2}}, a::AbstractVector{T}) where
     # @inbounds for k = n+1:min(m - 1 + !(T<:Real), n+1)
         factors = zeros(m, n+1)
         view(factors,:,1:n) .= S.factors
-        view(factors,:,n+1) .= a
+        mul!(view(factors,:,n+1), S.Q', a)
         x = view(factors, n+1:m, n+1)
         τk = LinearAlgebra.reflector!(x)
         push!(S.τ, τk)

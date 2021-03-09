@@ -13,7 +13,7 @@ function qromp(ψ::AbstractMatrix{T}, c::AbstractVector{T}, u::AbstractVector{T}
     idxset = Int64[]
     dict = collect(1:n)
     ϵrel *= norm(u)
-    ϕ = zeros(n)
+    ϕ = zeros(T, n)
 
     for j=1:n
         for i=1:m
@@ -22,8 +22,8 @@ function qromp(ψ::AbstractMatrix{T}, c::AbstractVector{T}, u::AbstractVector{T}
     end
 
     F = qrfactUnblocked(zeros(0,0))
-    ek = zeros(n)
-    q = zeros(m)
+    ek = zeros(T, n)
+    q = zeros(T, m)
     new_idx = 1
 
     @inbounds for k=1:n
@@ -45,7 +45,7 @@ function qromp(ψ::AbstractMatrix{T}, c::AbstractVector{T}, u::AbstractVector{T}
                 new_idx = idx
             end
         end
-        @show entry, new_idx
+        # @show entry, new_idx
 
         # Step 8 Update set of selected basis
         push!(idxset, new_idx)
@@ -61,6 +61,7 @@ function qromp(ψ::AbstractMatrix{T}, c::AbstractVector{T}, u::AbstractVector{T}
             F = qrfactUnblocked(ψ[:,new_idx:new_idx])
         end
 
+
         # Step 11 Update residual
         ek[k] = 1.0
         mul!(q, F.Q, ek)
@@ -69,15 +70,20 @@ function qromp(ψ::AbstractMatrix{T}, c::AbstractVector{T}, u::AbstractVector{T}
         residue -= q
         # Step 12 Calculate stopping critera
         ϵ = norm(residue)
-        @show ϵ/norm(u)
+        # @show ϵ/norm(u)
         if ϵ < ϵrel
             break
         end
     end
 
     # Solve the system with the set of indices
-    if backsolve == true
-        ldiv!(c, F, u)
-        return idxset, c
-    end
+    ldiv!(c, F, u)
+        P = zeros(T, n, n)
+        for i in 1:n
+                    P[idxset[i],i] = one(T)
+        end
+
+        cOMP = F\u
+        cLS = ψ\u
+        return idxset, cOMP
 end
