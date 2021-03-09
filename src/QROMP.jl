@@ -4,6 +4,7 @@ using LinearAlgebra
 using LoopVectorization
 
 include("qr.jl")
-include("omp.jl")
+include("lsomp.jl")
+include("qromp.jl")
 
 end # module
