@@ -6,7 +6,7 @@ export lsomp
 
 # Solve ψc = u using the orthogonal matching pursuit with least-square
 
-function lsomp(ψ::AbstractMatrix{T}, u::AbstractVector{T}; invert::Bool=true, verbose::Bool = true, ϵrel::Float64 = 1e-1) where {T}
+function lsomp(ψ::AbstractMatrix{T}, u::AbstractVector{T}; invert::Bool=true, verbose::Bool = true, ϵrel::Float64 = 1e-1, maxterms::Int64=typemax(Int64)) where {T}
     m, n = size(ψ)
 
     residue = copy(u)
@@ -43,16 +43,13 @@ function lsomp(ψ::AbstractMatrix{T}, u::AbstractVector{T}; invert::Bool=true, v
                 new_idx = idx
             end
         end
-        # @show entry, new_idx
 
         # Step 8 Update set of selected basis
         push!(idxset, new_idx)
 
         # Step 9 Update candidate dictionary
-        # filter!(x-> x != new_idx, dict)
-        setdiff!(dict, new_idx)
-
-
+        filter!(x-> x != new_idx, dict)
+        # setdiff!(dict, new_idx)
 
         # Step 10 Compute residual
         c = view(ψ,:,idxset)\u
@@ -63,10 +60,12 @@ function lsomp(ψ::AbstractMatrix{T}, u::AbstractVector{T}; invert::Bool=true, v
         if verbose == true
             push!(ϵhist, copy(ϵ))
         end
-        if ϵ < ϵrel
+        if ϵ < ϵrel || k == maxterms
             break
         end
     end
+
+    # Solve the system with the set of indices
     if verbose == true
         if invert == true
             c = zeros(length(idxset))

@@ -4,4 +4,5 @@ using LinearAlgebra
 using Test
 
 include("qr.jl")
+include("pivotedqr.jl")
 include("omp.jl")
