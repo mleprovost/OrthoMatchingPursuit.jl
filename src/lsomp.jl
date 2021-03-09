@@ -39,8 +39,8 @@ function lsomp(ψ::AbstractMatrix{T}, u::AbstractVector{T}; invert::Bool=true, v
             ratio /= ϕ[idx]
 
             if ratio > entry
-                entry = ratio
-                new_idx = idx
+                entry = copy(ratio)
+                new_idx = copy(idx)
             end
         end
 

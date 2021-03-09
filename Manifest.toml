@@ -23,17 +23,9 @@ uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
 
 [[BenchmarkTools]]
 deps = ["JSON", "Logging", "Printf", "Statistics", "UUIDs"]
-git-tree-sha1 = "9e62e66db34540a0c919d72172cc2f642ac71260"
+git-tree-sha1 = "8b8279aa9b15b4ee2d0e06bc5208f486a8ad65cc"
 uuid = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
-version = "0.5.0"
-
-[[BlockDiagonal]]
-deps = ["LinearAlgebra"]
-git-tree-sha1 = "fd01e9b06436a4f56323c529a7d66285d0e48dca"
-repo-rev = "master"
-repo-url = "https://bitbucket.org/cgeoga/blockdiagonal.jl.git"
-uuid = "1b959d4a-82ef-11e9-2b51-1f64d30f5fc4"
-version = "0.4.1"
+version = "0.6.0"
 
 [[CodeTracking]]
 deps = ["InteractiveUtils", "UUIDs"]
@@ -236,9 +228,9 @@ uuid = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 
 [[Static]]
 deps = ["IfElse"]
-git-tree-sha1 = "718958214486a81557e87f09762352239042d948"
+git-tree-sha1 = "e59fea643e12d4fa39098c833bd07cd0cd950297"
 uuid = "aedffcd0-7271-4cad-89d0-dc628f76c6d3"
-version = "0.2.2"
+version = "0.2.3"
 
 [[Statistics]]
 deps = ["LinearAlgebra", "SparseArrays"]

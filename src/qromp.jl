@@ -25,7 +25,8 @@ function qromp(ψ::AbstractMatrix{T}, u::AbstractVector{T}; invert::Bool=true, v
     end
 
     F = qrfactUnblocked(zeros(0,0))
-    ek = zeros(T, n)
+    # ek = zeros(T, n)
+    # ektest = zeros(T, n)
     q = zeros(T, m)
     new_idx = 1
 
@@ -35,17 +36,22 @@ function qromp(ψ::AbstractMatrix{T}, u::AbstractVector{T}; invert::Bool=true, v
         entry = 0.0
         for (j, idx) in enumerate(dict)
             ψj = view(ψ,:,idx)
-            if k>1
-                ϕj = q'*ψj
-                ϕ[idx] -= ϕj^2
-            end
             ratio = residue'*ψj
             ratio = ratio^2
             ratio /= ϕ[idx]
 
-            if ratio > entry
-                entry = ratio
-                new_idx = idx
+            if k>1
+                ϕj = q'*ψj
+                ϕ[idx] -= ϕj^2
+                # fill!(ektest, 0.0)
+                ektest = zeros(T, k-1)
+                ektest[k-1] = 1.0
+                @show norm(F.Q*ektest - q)
+            end
+
+            if ratio >= entry
+                entry = copy(ratio)
+                new_idx = copy(idx)
             end
         end
 
@@ -59,17 +65,23 @@ function qromp(ψ::AbstractMatrix{T}, u::AbstractVector{T}; invert::Bool=true, v
         # Step 10 Update Q(k-1) and R(k-1) with ψi(k)
         if k>1
             F = updateqrfactUnblocked!(F, view(ψ,:,new_idx))
-            ek[k-1] = 0.0
+            # ek[k-1] = 0.0
         else
             F = qrfactUnblocked(ψ[:,new_idx:new_idx])
         end
 
+        # for (j, idx) in enumerate(dict)
+        #     ψj = view(ψ,:,idx)
+        #     @show norm(ϕ[idx] - norm((I-F.Q*F.Q')*ψj))
+        # end
+
         # Step 11 Update residual
+        ek = zeros(T, k)
         ek[k] = 1.0
         mul!(q, F.Q, ek)
         factor = q'*u
-        q .*= factor
-        residue -= q
+        # q .*= factor
+        residue -= factor*q
         # Step 12 Calculate stopping critera
         ϵ = norm(residue)
         # @show ϵ/norm(u)
@@ -86,7 +98,7 @@ function qromp(ψ::AbstractMatrix{T}, u::AbstractVector{T}; invert::Bool=true, v
         if invert == true
             c = zeros(length(idxset))
             ldiv!(c, F, u)
-            return idxset, c, ϵhist
+            return idxset, c, ϵhist, F
         else
             return idxset, ϵhist
         end
