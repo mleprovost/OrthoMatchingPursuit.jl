@@ -40,10 +40,8 @@ function qromp(ψ::AbstractMatrix{T}, u::AbstractVector{T}; invert::Bool=true, v
             ratio = ratio^2
             ratio /= ϕ[idx]
 
-            if k>1
-                ϕj = q'*ψj
-                ϕ[idx] -= ϕj^2
-            end
+            ϕj = q'*ψj
+            ϕ[idx] -= ϕj^2
 
             if ratio >= entry
                 entry = copy(ratio)
@@ -51,12 +49,14 @@ function qromp(ψ::AbstractMatrix{T}, u::AbstractVector{T}; invert::Bool=true, v
             end
         end
 
-        if k>1
-            for (j, idx) in enumerate(dict)
-                ψj = view(ψ,:,idx)
-                @show norm(ϕ[idx] - norm(ψj-F.Q*(F.Q'*ψj)))
-            end
-        end
+        # if k>1
+        #     for (j, idx) in enumerate(dict)
+        #         ψj = view(ψ,:,idx)
+        #         @show norm(ϕ[idx] - norm(ψj-Matrix(F.Q)[:,1:k-1]*(Matrix(F.Q)[:,1:k-1]'*ψj))^2)
+        #     end
+        # end
+
+
 
         # Step 8 Update set of selected basis
         push!(idxset, new_idx)
@@ -71,6 +71,7 @@ function qromp(ψ::AbstractMatrix{T}, u::AbstractVector{T}; invert::Bool=true, v
         else
             F = qrfactUnblocked(ψ[:,new_idx:new_idx])
         end
+
 
 
 
@@ -96,7 +97,7 @@ function qromp(ψ::AbstractMatrix{T}, u::AbstractVector{T}; invert::Bool=true, v
         if invert == true
             c = zeros(length(idxset))
             ldiv!(c, F, u)
-            return idxset, c, ϵhist, F
+            return idxset, c, ϵhist
         else
             return idxset, ϵhist
         end

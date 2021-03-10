@@ -1,5 +1,11 @@
 # This file is machine-generated - editing it directly is not advised
 
+[[AbstractTrees]]
+deps = ["Markdown", "Test"]
+git-tree-sha1 = "6621d9645702c1c4e6970cc6a3eae440c768000b"
+uuid = "1520ce14-60c1-5f80-bbc7-55ef81b5835c"
+version = "0.2.1"
+
 [[Adapt]]
 deps = ["LinearAlgebra"]
 git-tree-sha1 = "ffcfa2d345aaee0ef3d8346a073d5dd03c983ebe"
@@ -43,6 +49,12 @@ deps = ["JSON", "VersionParsing"]
 git-tree-sha1 = "6231e40619c15148bcb80aa19d731e629877d762"
 uuid = "8f4d0f93-b110-5947-807f-2305c1781a2d"
 version = "1.5.1"
+
+[[Convex]]
+deps = ["AbstractTrees", "LinearAlgebra", "MathProgBase", "OrderedCollections", "SparseArrays"]
+git-tree-sha1 = "fc51005161a66474a1b331c2493d223343cca7ef"
+uuid = "f65535da-76fb-5f13-bab9-19810c17039a"
+version = "0.12.5"
 
 [[Dates]]
 deps = ["Printf"]
@@ -134,6 +146,12 @@ version = "1.2.9"
 [[Markdown]]
 deps = ["Base64"]
 uuid = "d6f4376e-aef5-505a-96c1-9c027394607a"
+
+[[MathProgBase]]
+deps = ["LinearAlgebra", "SparseArrays"]
+git-tree-sha1 = "9abbe463a1e9fc507f12a69e7f29346c2cdc472c"
+uuid = "fdba3010-5040-5b88-9595-932c9decdf73"
+version = "0.7.8"
 
 [[MbedTLS]]
 deps = ["Dates", "MbedTLS_jll", "Random", "Sockets"]
