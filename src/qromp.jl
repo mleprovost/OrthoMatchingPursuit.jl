@@ -25,7 +25,7 @@ function qromp(ψ::AbstractMatrix{T}, u::AbstractVector{T}; invert::Bool=true, v
     end
 
     F = qrfactUnblocked(zeros(0,0))
-    # ek = zeros(T, n)
+    ek = zeros(T, n)
     # ektest = zeros(T, n)
     q = zeros(T, m)
     new_idx = 1
@@ -43,10 +43,6 @@ function qromp(ψ::AbstractMatrix{T}, u::AbstractVector{T}; invert::Bool=true, v
             if k>1
                 ϕj = q'*ψj
                 ϕ[idx] -= ϕj^2
-                # fill!(ektest, 0.0)
-                ektest = zeros(T, k-1)
-                ektest[k-1] = 1.0
-                @show norm(F.Q*ektest - q)
             end
 
             if ratio >= entry
@@ -55,32 +51,34 @@ function qromp(ψ::AbstractMatrix{T}, u::AbstractVector{T}; invert::Bool=true, v
             end
         end
 
+        if k>1
+            for (j, idx) in enumerate(dict)
+                ψj = view(ψ,:,idx)
+                @show norm(ϕ[idx] - norm(ψj-F.Q*(F.Q'*ψj)))
+            end
+        end
+
         # Step 8 Update set of selected basis
         push!(idxset, new_idx)
 
         # Step 9 Update candidate dictionary
         filter!(x-> x != new_idx, dict)
-        # setdiff!(dict, new_idx)
 
         # Step 10 Update Q(k-1) and R(k-1) with ψi(k)
         if k>1
             F = updateqrfactUnblocked!(F, view(ψ,:,new_idx))
-            # ek[k-1] = 0.0
+            ek[k-1] = 0.0
         else
             F = qrfactUnblocked(ψ[:,new_idx:new_idx])
         end
 
-        # for (j, idx) in enumerate(dict)
-        #     ψj = view(ψ,:,idx)
-        #     @show norm(ϕ[idx] - norm((I-F.Q*F.Q')*ψj))
-        # end
+
 
         # Step 11 Update residual
-        ek = zeros(T, k)
         ek[k] = 1.0
-        mul!(q, F.Q, ek)
+        mul!(q, F.Q, ek[1:k])
+
         factor = q'*u
-        # q .*= factor
         residue -= factor*q
         # Step 12 Calculate stopping critera
         ϵ = norm(residue)
