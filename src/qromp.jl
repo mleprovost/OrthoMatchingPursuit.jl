@@ -36,12 +36,9 @@ function qromp(ψ::AbstractMatrix{T}, u::AbstractVector{T}; invert::Bool=true, v
         entry = 0.0
         for (j, idx) in enumerate(dict)
             ψj = view(ψ,:,idx)
-            ratio = residue'*ψj
+            ratio = dot(residue, ψj)
             ratio = ratio^2
             ratio /= ϕ[idx]
-
-            ϕj = q'*ψj
-            ϕ[idx] -= ϕj^2
 
             if ratio >= entry
                 entry = copy(ratio)
@@ -72,14 +69,17 @@ function qromp(ψ::AbstractMatrix{T}, u::AbstractVector{T}; invert::Bool=true, v
             F = qrfactUnblocked(ψ[:,new_idx:new_idx])
         end
 
-
-
-
         # Step 11 Update residual
         ek[k] = 1.0
         mul!(q, F.Q, ek[1:k])
 
-        factor = q'*u
+        for (j, idx) in enumerate(dict)
+            ψj = view(ψ,:,idx)
+            ϕj = dot(q, ψj)
+            ϕ[idx] -= ϕj^2
+        end
+
+        factor = dot(q, u)
         residue -= factor*q
         # Step 12 Calculate stopping critera
         ϵ = norm(residue)
