@@ -34,27 +34,6 @@ function qrfactUnblocked(A::AbstractMatrix{T}, arg...; kwargs...) where T
     return LinearAlgebra.qrfactUnblocked!(AA, arg...; kwargs...)
 end
 
-function updateqrfactUnblocked!(S::UpdatableQR{T}, a::AbstractVector{T}) where {T}
-    m, n = size(S.factors)
-    # Add one entry to F.τ
-
-    # Add one column to F.factors
-    # factors = hcat(S.factors, S.Q'*a)
-
-    # @inbounds for k = n+1:min(m - 1 + !(T<:Real), n+1)
-        mul!(S.cache, S.Q', a)
-        push!(S.factors, copy(cache))
-        # view(factors,:,1:n) .= S.factors
-        # mul!(view(factors,:,n+1), , a)
-        # factors = hcat(S.factors, S.Q'*a)
-        x = view(S.factors, n+1:m, n+1)
-        τk = LinearAlgebra.reflector!(x)
-        push!(S.τ, τk)
-        # LinearAlgebra.reflectorApply!(x, τk, view(factors, k:m, k + 1:n + 1))
-    # end
-    # return QR(factors, S.τ)
-end
-
 function updateqrfactUnblocked!(S::QR{T,Array{T,2}}, a::AbstractVector{T}) where {T}
     m, n = size(S.factors)
     # Add one entry to F.τ
@@ -75,10 +54,26 @@ function updateqrfactUnblocked!(S::QR{T,Array{T,2}}, a::AbstractVector{T}) where
     return QR(factors, S.τ)
 end
 
-
-
-
+# function updateqrfactUnblocked!(S::UpdatableQR{T}, a::AbstractVector{T}) where {T}
+#     m, n = size(S.factors)
+#     # Add one entry to F.τ
 #
+#     # Add one column to F.factors
+#     # factors = hcat(S.factors, S.Q'*a)
+#
+#     # @inbounds for k = n+1:min(m - 1 + !(T<:Real), n+1)
+#         mul!(S.cache, , a)
+#         push!(S.factors, S.Q'*a)
+#         # view(factors,:,1:n) .= S.factors
+#         # mul!(view(factors,:,n+1), , a)
+#         # factors = hcat(S.factors, S.Q'*a)
+#         x = view(S.factors, n+1:m, n+1)
+#         τk = LinearAlgebra.reflector!(x)
+#         push!(S.τ, τk)
+#         # LinearAlgebra.reflectorApply!(x, τk, view(factors, k:m, k + 1:n + 1))
+#     # end
+#     # return QR(factors, S.τ)
+# end
 # function UpdatableQR(A::AbstractMatrix{T}) where T
 #     return UpdatableQR{T}
 # end

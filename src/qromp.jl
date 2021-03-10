@@ -18,7 +18,7 @@ function qromp(ψ::AbstractMatrix{T}, u::AbstractVector{T}; invert::Bool=true, v
     ϕ = zeros(T, n)
 
 
-    for j=1:n
+    @inbounds for j=1:n
         for i=1:m
         ϕ[j] += ψ[i,j]^2
         end
@@ -26,7 +26,8 @@ function qromp(ψ::AbstractMatrix{T}, u::AbstractVector{T}; invert::Bool=true, v
 
     # F = qrfactUnblocked(zeros(0,0))
     # F = elasticqrfact(zeros(m,0))
-    F = elasticqrfact(ψ[:,1:1])
+    cache = zeros(T, m)
+    F = elasticqrfact(reshape(cache, length(cache),1))
     ek = zeros(T, n)
     # ektest = zeros(T, n)
     q = zeros(T, m)
@@ -36,7 +37,7 @@ function qromp(ψ::AbstractMatrix{T}, u::AbstractVector{T}; invert::Bool=true, v
         # Step 6 & 7 update denominators and choose best candidate
 
         entry = 0.0
-        for (j, idx) in enumerate(dict)
+        @fastmath @inbounds for (j, idx) in enumerate(dict)
             ψj = view(ψ,:,idx)
             ratio = dot(residue, ψj)
             ratio = ratio^2
@@ -66,30 +67,29 @@ function qromp(ψ::AbstractMatrix{T}, u::AbstractVector{T}; invert::Bool=true, v
         # Step 10 Update Q(k-1) and R(k-1) with ψi(k)
         if k>1
             # F = updateqrfactUnblocked!(F, view(ψ,:,new_idx))
-            updateelasticqrfact!(F, view(ψ,:,new_idx))
+            updateelasticqrfact!(F, view(ψ,:,new_idx), cache)
 
             ek[k-1] = 0.0
         else
             # F = qrfactUnblocked(ψ[:,new_idx:new_idx])
-            F = elasticqrfact(ψ[:,new_idx:new_idx])
+            F = elasticqrfact(view(ψ,:,new_idx:new_idx))
         end
 
         # Step 11 Update residual
         ek[k] = 1.0
-        # @show F
-        mul!(q, F.Q, ek[1:k])
+        mul!(q, F.Q, view(ek,1:k))
 
-        for (j, idx) in enumerate(dict)
+        @inbounds for (j, idx) in enumerate(dict)
             ψj = view(ψ,:,idx)
             ϕj = dot(q, ψj)
             ϕ[idx] -= ϕj^2
         end
-
         factor = dot(q, u)
         residue -= factor*q
+
         # Step 12 Calculate stopping critera
         ϵ = norm(residue)
-        # @show ϵ/norm(u)
+
         if verbose == true
             push!(ϵhist, copy(ϵ))
         end
