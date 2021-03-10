@@ -24,7 +24,9 @@ function qromp(ψ::AbstractMatrix{T}, u::AbstractVector{T}; invert::Bool=true, v
         end
     end
 
-    F = qrfactUnblocked(zeros(0,0))
+    # F = qrfactUnblocked(zeros(0,0))
+    # F = elasticqrfact(zeros(m,0))
+    F = elasticqrfact(ψ[:,1:1])
     ek = zeros(T, n)
     # ektest = zeros(T, n)
     q = zeros(T, m)
@@ -63,14 +65,18 @@ function qromp(ψ::AbstractMatrix{T}, u::AbstractVector{T}; invert::Bool=true, v
 
         # Step 10 Update Q(k-1) and R(k-1) with ψi(k)
         if k>1
-            F = updateqrfactUnblocked!(F, view(ψ,:,new_idx))
+            # F = updateqrfactUnblocked!(F, view(ψ,:,new_idx))
+            updateelasticqrfact!(F, view(ψ,:,new_idx))
+
             ek[k-1] = 0.0
         else
-            F = qrfactUnblocked(ψ[:,new_idx:new_idx])
+            # F = qrfactUnblocked(ψ[:,new_idx:new_idx])
+            F = elasticqrfact(ψ[:,new_idx:new_idx])
         end
 
         # Step 11 Update residual
         ek[k] = 1.0
+        # @show F
         mul!(q, F.Q, ek[1:k])
 
         for (j, idx) in enumerate(dict)

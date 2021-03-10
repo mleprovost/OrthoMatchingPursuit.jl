@@ -1,3 +1,6 @@
+
+__precompile__(true)
+
 module QROMP
 
 using LinearAlgebra
