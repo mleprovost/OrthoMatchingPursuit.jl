@@ -1,13 +1,49 @@
-export UpdatableQR, qrfactUnblocked, updateqrfactUnblocked!
+export qrfactUnblocked, updateqrfactUnblocked!
 
-struct UpdatableQR{T} <: Factorization{T}
-    factors::Array{Array{T,1},1}
-    τ::Array{Float64,1}
-    # cache::Array{Float64,1}
+# Add the non in-place version of qrfactUnblocked! defined in
+# https://github.com/JuliaLang/julia/blob/master/stdlib/LinearAlgebra/src/qr.jl
+function qrfactUnblocked(A::AbstractMatrix{T}, arg...; kwargs...) where T
+    LinearAlgebra.require_one_based_indexing(A)
+    AA = similar(A, LinearAlgebra._qreltype(T), size(A))
+    copyto!(AA, A)
+    return LinearAlgebra.qrfactUnblocked!(AA, arg...; kwargs...)
 end
 
+function updateqrfactUnblocked!(S::QR{T,Array{T,2}}, a::AbstractVector{T}) where {T}
+    m, n = size(S.factors)
+    # Add one entry to F.τ
+    # Add one column to F.factors
+    # factors = hcat(S.factors, S.Q'*a)
 
+    factors = zeros(m, n+1)
+    view(factors,:,1:n) .= S.factors
+    mul!(view(factors,:,n+1), S.Q', a)
+    # factors = hcat(S.factors, S.Q'*a)
+    x = view(factors, n+1:m, n+1)
+    τk = LinearAlgebra.reflector!(x)
+    push!(S.τ, τk)
 
+    return QR(factors, S.τ)
+end
+
+function updateqrfactUnblocked!(S::QR{T,Array{T,2}}, A::AbstractMatrix{T}) where {T}
+    m, n = size(S.factors)
+    mA, nA = size(A)
+    @assert mA == m "Length of the columns do not match"
+    # Add one entry to F.τ
+
+    # Add one column to F.factors
+    factors = zeros(m, n+nA)
+    factors .= hcat(S.factors, S.Q'*A)
+
+    @inbounds for k = n+1:min(m - 1 + !(T<:Real), n+nA)
+        x = view(factors, k:m, k)
+        τk = LinearAlgebra.reflector!(x)
+        push!(S.τ, τk)
+        LinearAlgebra.reflectorApply!(x, τk, view(factors, k:m, k + 1:n + nA))
+    end
+    return QR(factors, S.τ)
+end
 
 
 # in-place version of qrfactUnblocked! defined in
@@ -25,34 +61,29 @@ end
 #         QR(A, τ)
 # end
 
-# Add the non in-place version of qrfactUnblocked! defined in
+
+# struct UpdatableQR{T} <: Factorization{T}
+#     factors::Array{Array{T,1},1}
+#     τ::Array{Float64,1}
+#     # cache::Array{Float64,1}
+# end
+#
+
+# in-place version of qrfactUnblocked! defined in
 # https://github.com/JuliaLang/julia/blob/master/stdlib/LinearAlgebra/src/qr.jl
-function qrfactUnblocked(A::AbstractMatrix{T}, arg...; kwargs...) where T
-    LinearAlgebra.require_one_based_indexing(A)
-    AA = similar(A, LinearAlgebra._qreltype(T), size(A))
-    copyto!(AA, A)
-    return LinearAlgebra.qrfactUnblocked!(AA, arg...; kwargs...)
-end
+# function qrfactUnblocked!(A::AbstractMatrix{T}) where {T}
+#     LinearAlgebra.require_one_based_indexing(A)
+#     m, n = size(A)
+#     τ = zeros(T, min(m,n))
+#     for k = 1:min(m - 1 + !(T<:Real), n)
+#         x = view(A, k:m, k)
+#         τk = LinearAlgebra.reflector!(x)
+#         τ[k] = τk
+#         LinearAlgebra.reflectorApply!(x, τk, view(A, k:m, k + 1:n))
+#     end
+#         QR(A, τ)
+# end
 
-function updateqrfactUnblocked!(S::QR{T,Array{T,2}}, a::AbstractVector{T}) where {T}
-    m, n = size(S.factors)
-    # Add one entry to F.τ
-
-    # Add one column to F.factors
-    # factors = hcat(S.factors, S.Q'*a)
-
-    # @inbounds for k = n+1:min(m - 1 + !(T<:Real), n+1)
-        factors = zeros(m, n+1)
-        view(factors,:,1:n) .= S.factors
-        mul!(view(factors,:,n+1), S.Q', a)
-        # factors = hcat(S.factors, S.Q'*a)
-        x = view(factors, n+1:m, n+1)
-        τk = LinearAlgebra.reflector!(x)
-        push!(S.τ, τk)
-        # LinearAlgebra.reflectorApply!(x, τk, view(factors, k:m, k + 1:n + 1))
-    # end
-    return QR(factors, S.τ)
-end
 
 # function updateqrfactUnblocked!(S::UpdatableQR{T}, a::AbstractVector{T}) where {T}
 #     m, n = size(S.factors)

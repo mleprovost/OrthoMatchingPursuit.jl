@@ -12,7 +12,7 @@ function elasticqrfact!(A::AbstractMatrix{T}) where {T}
     LinearAlgebra.require_one_based_indexing(A)
     m, n = size(A)
     τ = zeros(T, min(m,n))
-    for k = 1:min(m - 1 + !(T<:Real), n)
+    @inbounds for k = 1:min(m - 1 + !(T<:Real), n)
         x = view(A, k:m, k)
         τk = LinearAlgebra.reflector!(x)
         τ[k] = τk
@@ -32,24 +32,25 @@ function updateelasticqrfact!(S::QR{T,ElasticArray{T,2,1,Array{T,1}}}, a::Abstra
     m, n = size(S.factors)
     mul!(cache, S.Q', a)
     @inbounds append!(S.factors, cache)
-    # Add one entry to F.τ
-
-    # Add one column to F.factors
-    # factors = hcat(S.factors, S.Q'*a)
-
-    # @inbounds for k = n+1:min(m - 1 + !(T<:Real), n+1)
-        # mul!(S.cache, S.Q', a)
-        # push!(S.factors, copy(cache))
-        # view(factors,:,1:n) .= S.factors
-        # mul!(view(factors,:,n+1), , a)
-        # factors = hcat(S.factors, S.Q'*a)
     x = view(S.factors, n+1:m, n+1)
     τk = LinearAlgebra.reflector!(x)
     @inbounds push!(S.τ, τk)
     nothing
-        # LinearAlgebra.reflectorApply!(x, τk, view(factors, k:m, k + 1:n + 1))
-    # end
-    # return QR(factors, S.τ)
 end
 
 updateelasticqrfact!(S::QR{T,ElasticArray{T,2,1,Array{T,1}}}, a::AbstractVector{T}) where {T} = updateelasticqrfact!(S, a, zero(a))
+
+function updateelasticqrfact!(S::QR{T,ElasticArray{T,2,1,Array{T,1}}}, A::AbstractMatrix{T}) where {T}
+    m, n = size(S.factors)
+    mA, nA = size(A)
+    @assert mA == m "Length of the columns do not match"
+
+    @inbounds append!(S.factors, S.Q'*A)
+
+    @inbounds for k = n+1:min(m - 1 + !(T<:Real), n+nA)
+        x = view(S.factors, k:m, k)
+        τk = LinearAlgebra.reflector!(x)
+        push!(S.τ, τk)
+        LinearAlgebra.reflectorApply!(x, τk, view(S.factors, k:m, k + 1:n + nA))
+    end
+end
