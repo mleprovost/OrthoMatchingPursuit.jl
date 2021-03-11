@@ -40,12 +40,15 @@ end
 
 updateelasticqrfact!(S::QR{T,ElasticArray{T,2,1,Array{T,1}}}, a::AbstractVector{T}) where {T} = updateelasticqrfact!(S, a, zero(a))
 
-function updateelasticqrfact!(S::QR{T,ElasticArray{T,2,1,Array{T,1}}}, A::AbstractMatrix{T}) where {T}
+function updateelasticqrfact!(S::QR{T,ElasticArray{T,2,1,Array{T,1}}}, A::AbstractMatrix{T}, cache) where {T}
     m, n = size(S.factors)
     mA, nA = size(A)
     @assert mA == m "Length of the columns do not match"
 
-    @inbounds append!(S.factors, S.Q'*A)
+    @inbounds mul!(cache, S.Q', A)
+    @inbounds append!(S.factors, cache)
+    # @for k=n+1:n+nA
+    #     append!(S.factors, S.Q'
 
     @inbounds for k = n+1:min(m - 1 + !(T<:Real), n+nA)
         x = view(S.factors, k:m, k)
@@ -54,3 +57,5 @@ function updateelasticqrfact!(S::QR{T,ElasticArray{T,2,1,Array{T,1}}}, A::Abstra
         LinearAlgebra.reflectorApply!(x, τk, view(S.factors, k:m, k + 1:n + nA))
     end
 end
+
+updateelasticqrfact!(S::QR{T,ElasticArray{T,2,1,Array{T,1}}}, A::AbstractMatrix{T}) where {T} = updateelasticqrfact!(S, A, zero(A))
