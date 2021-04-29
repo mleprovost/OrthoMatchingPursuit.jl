@@ -5,7 +5,6 @@ module QROMP
 
 using LinearAlgebra
 using ElasticArrays
-using LoopVectorization
 
 include("qr.jl")
 include("elasticqr.jl")

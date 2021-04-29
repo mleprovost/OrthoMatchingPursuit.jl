@@ -9,6 +9,7 @@
 *.svg
 .ipynb_checkpoints
 papers/
+Manifest.toml
 
 # temporary matlab files
 *.m~
@@ -21,4 +22,4 @@ papers/
 # Documentation build
 *.js
 *.html
-*.css
+*.css 
