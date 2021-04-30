@@ -1,7 +1,7 @@
 name = "QROMP"
 uuid = "2ae2181e-4684-4b2c-a413-203f2dd831ec"
 authors = ["mleprovost <mathow@g.ucla.edu>"]
-version = "0.1.0"
+version = "0.2.0"
 
 [deps]
 ElasticArrays = "fdbdab4c-e67f-52f5-8c3f-e7b388dad3d4"
