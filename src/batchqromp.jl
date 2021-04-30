@@ -2,6 +2,8 @@ export batchqromp
 
 # Write a batch version of the QR-OMP code
 
+# Should not be considered production-ready
+
 function batchqromp(ψ::AbstractMatrix{T}, u::AbstractVector{T}; invert::Bool=true, verbose::Bool = true, ϵrel::Float64 = 1e-1, batchterms::Int64 = 1, maxterms::Int64=typemax(Int64)) where {T}
     m, n = size(ψ)
 
