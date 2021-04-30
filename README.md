@@ -4,14 +4,14 @@ _A package to perform orthogonal matching pursuit for linear systems._
 
 ## About the package
 
-**OrthoMatchPursuit.jl.jl** is registered in the general Julia registry. To install, type
+**OrthoMatchPursuit.jl** is registered in the general Julia registry. To install, type
 e.g.,
 ```julia
-] add OrthoMatchPursuit.jl
+] add OrthoMatchPursuit
 ```
 
 Then, in any version, type
 ```julia
-julia> using OrthoMatchPursuit.jl
+julia> using OrthoMatchPursuit
 ```
 For examples, consult the notebooks folder.
