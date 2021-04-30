@@ -1,4 +1,4 @@
-The OrthoMatchPursuit package is licensed under the MIT License:
+The OrthoMatchingPursuit package is licensed under the MIT License:
 
 Copyright (c) 2021 Mathieu Le Provost
 

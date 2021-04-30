@@ -1,5 +1,5 @@
 
-using OrthoMatchPursuit
+using OrthoMatchingPursuit
 using LinearAlgebra
 using Test
 

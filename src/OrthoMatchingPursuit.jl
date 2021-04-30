@@ -1,7 +1,7 @@
 
 __precompile__(true)
 
-module OrthoMatchPursuit
+module OrthoMatchingPursuit
 
 using LinearAlgebra
 using ElasticArrays
