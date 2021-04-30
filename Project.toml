@@ -1,4 +1,4 @@
-name = "QROMP"
+name = "OrthoMatchPursuit"
 uuid = "2ae2181e-4684-4b2c-a413-203f2dd831ec"
 authors = ["mleprovost <mathow@g.ucla.edu>"]
 version = "0.2.0"

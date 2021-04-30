@@ -1,4 +1,4 @@
-The QROMP package is licensed under the MIT License:
+The OrthoMatchPursuit package is licensed under the MIT License:
 
 Copyright (c) 2021 Mathieu Le Provost
 

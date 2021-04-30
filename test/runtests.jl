@@ -1,5 +1,5 @@
 
-using QROMP
+using OrthoMatchPursuit
 using LinearAlgebra
 using Test
 

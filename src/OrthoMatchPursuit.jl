@@ -1,7 +1,7 @@
 
 __precompile__(true)
 
-module QROMP
+module OrthoMatchPursuit
 
 using LinearAlgebra
 using ElasticArrays
